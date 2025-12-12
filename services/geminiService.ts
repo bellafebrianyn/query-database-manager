@@ -2,7 +2,7 @@ import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { ProjectData } from "../types";
 
 // Initialize Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 let chatSession: Chat | null = null;
 
