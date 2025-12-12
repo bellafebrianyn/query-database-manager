@@ -1,11 +1,14 @@
 // Cloudinary Configuration
-const CLOUD_NAME = 'dgovg2mxz';
-const API_KEY = '787819396388652';
-const API_SECRET = 'cqlqXvH8b9VppmPBDn5WlhJICqc';
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const API_KEY = process.env.CLOUDINARY_API_KEY;
+const API_SECRET = process.env.CLOUDINARY_API_SECRET;
 const PUBLIC_ID = 'project_data_master.xlsx'; // Fixed ID to overwrite the file
 
 // Helper to create SHA-1 signature for Cloudinary API
 async function generateSignature(params: Record<string, string>): Promise<string> {
+  if (!API_SECRET) {
+    throw new Error("CLOUDINARY_API_SECRET is missing in environment variables");
+  }
   const sortedKeys = Object.keys(params).sort();
   const stringToSign = sortedKeys.map(key => `${key}=${params[key]}`).join('&') + API_SECRET;
   
@@ -20,6 +23,10 @@ async function generateSignature(params: Record<string, string>): Promise<string
  * Uploads a file to Cloudinary as a raw resource, overwriting the previous one.
  */
 export const uploadToCloudinary = async (file: File): Promise<void> => {
+  if (!CLOUD_NAME || !API_KEY) {
+    throw new Error("Cloudinary credentials (CLOUD_NAME or API_KEY) are missing.");
+  }
+
   const timestamp = Math.floor(Date.now() / 1000).toString();
   
   const params = {
@@ -54,6 +61,10 @@ export const uploadToCloudinary = async (file: File): Promise<void> => {
  * Returns an ArrayBuffer to be parsed by XLSX.
  */
 export const fetchFromCloudinary = async (): Promise<ArrayBuffer> => {
+  if (!CLOUD_NAME) {
+    throw new Error("CLOUDINARY_CLOUD_NAME is missing.");
+  }
+
   // Add a cache-busting timestamp to ensure we get the latest version
   const url = `https://res.cloudinary.com/${CLOUD_NAME}/raw/upload/project_data_master.xlsx?t=${Date.now()}`;
   
